@@ -1,7 +1,20 @@
+import re
+
+
+def get_author(data):
+    regex = re.compile(r'(?<=\().*(?=\))')
+    try:
+        author = regex.search(data)
+        return author.group(0)
+    except AttributeError:
+        return ''
+
+
 class Quote:
     def __init__(self, data):
-        self._book = data[0]
-        self._author = data[0]
+        book = data[0][:data[0].find('(')]
+        self._author = get_author(data[0])
+        self._book = book
         self._metadata = Metadata(data[2])
         self._text = data[3]
 
@@ -29,4 +42,3 @@ quotes = []
 for clip in clips:
     quote = Quote(clip)
     quotes.append(quote)
-    print(quotes[0]._book)
