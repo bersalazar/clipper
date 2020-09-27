@@ -22,3 +22,6 @@ for clip in clips:
     quote = Quote(clip)
     quotes.append(quote)
     logger.info(f'Added quote for book: {quote.book}; author: {quote.author}')
+
+for quote in quotes:
+    logger.info(f'Do something with this quote')
