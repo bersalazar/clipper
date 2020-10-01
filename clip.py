@@ -1,9 +1,6 @@
-from model import *
-
-
-logging.basicConfig(filename='app.log', level=logging.INFO)
-logger = logging.getLogger()
-logger.addHandler(logging.StreamHandler(sys.stdout))
+import os
+from model import Quote, logger
+from tinydb import TinyDB, Query
 
 block = []
 clips = []
@@ -17,6 +14,12 @@ for line in f:
 
 f.close()
 
+# db
+db_path = './db.json'
+if os.path.isfile(db_path):
+    os.remove('./db.json') 
+db = TinyDB(db_path)
+
 quotes = []
 for clip in clips:
     quote = Quote(clip)
@@ -24,4 +27,9 @@ for clip in clips:
     logger.info(f'Added quote for book: {quote.book}; author: {quote.author}')
 
 for quote in quotes:
-    logger.info(f'Do something with this quote')
+    logger.info(f'Insert record into DB')
+    db.insert({
+        'book': quote.book, 
+        'author': quote.author,
+        'text': quote.text
+    })
