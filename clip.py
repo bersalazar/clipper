@@ -26,10 +26,9 @@ for clip in clips:
     quotes.append(quote)
     logger.info(f'Added quote for book: {quote.book}; author: {quote.author}')
 
-for quote in quotes:
-    logger.info(f'Insert record into DB')
-    db.insert({
-        'book': quote.book, 
-        'author': quote.author,
-        'text': quote.text
-    })
+logger.info("Inserting records to the db...")
+db.insert_multiple({
+    'book': quote.book, 
+    'author': quote.author,
+    'text': quote.text
+} for quote in quotes)
