@@ -15,9 +15,6 @@ def parse_author(data):
         logger.error('Unable to parse author. Setting as empty...')
         return ''
 
-def parse_text(sentence):
-    words = sentence.split(" ")
-    return [word for word in words if word.isalnum()]
 
 class Quote:
     def __init__(self, data):
@@ -25,7 +22,8 @@ class Quote:
         self.__author = parse_author(data[0])
         self.__book = book
         self.__metadata = Metadata(data[2])
-        self.__text = parse_text(data[3])
+        self.__text = data[3]
+
 
     @property
     def author(self):

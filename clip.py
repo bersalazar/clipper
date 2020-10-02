@@ -4,7 +4,7 @@ from tinydb import TinyDB, Query
 
 block = []
 clips = []
-f = open('My Clippings.txt', 'r')
+f = open('My Clippings.txt', 'r', encoding='utf-8-sig')
 for line in f:
     if line.startswith('='):
         clips.append(block)
