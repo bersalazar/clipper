@@ -1,17 +1,23 @@
 import os
+import argparse
 from model import Quote, logger
 from tinydb import TinyDB, Query
 
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument('--path', help='path to the Kindle clippings file', default='My Clippings.txt', required=False)
+arg_parser.add_argument('--output', help='output type [json, pdf]', default='pdf', required=False)
+args = arg_parser.parse_args()
+
 block = []
 clips = []
-f = open('My Clippings.txt', 'r', encoding='utf-8-sig')
+
+f = open(args.path, 'r', encoding='utf-8-sig')
 for line in f:
     if line.startswith('='):
         clips.append(block)
         block = []
     else:
         block.append(line)
-
 f.close()
 
 # db
