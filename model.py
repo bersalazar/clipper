@@ -1,6 +1,7 @@
 import re
 import logging
 import sys
+from tinydb import Query
 
 logging.basicConfig(filename='app.log', level=logging.INFO)
 logger = logging.getLogger()
@@ -36,6 +37,9 @@ class Quote:
     @property
     def text(self):
         return self.__text
+
+    def is_found(self, db):
+        return db.search(Query().text.matches(self.text))
 
 
 class Metadata:
