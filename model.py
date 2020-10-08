@@ -1,11 +1,12 @@
 import re
-import logging
 import sys
+import logging
 from tinydb import Query
 
 logging.basicConfig(filename='app.log', level=logging.INFO)
 logger = logging.getLogger()
 logger.addHandler(logging.StreamHandler(sys.stdout))
+
 
 def parse_author(data):
     regex = re.compile(r'(?<=\().*(?=\))')
@@ -18,12 +19,13 @@ def parse_author(data):
 
 
 class Quote:
-    def __init__(self, data):
-        book = data[0][:data[0].find('(')]
-        self.__author = parse_author(data[0])
+    def __init__(self, block):
+        book = block[0][:block[0].find('(')]
         self.__book = book
-        self.__metadata = Metadata(data[2])
-        self.__text = data[3]
+        self.__author = parse_author(block[0])
+        self.__metadata = Metadata(block[2])
+        self.__text = block[3]
+        self.__block = block
 
 
     @property
@@ -37,6 +39,10 @@ class Quote:
     @property
     def text(self):
         return self.__text
+     
+    @property
+    def block(self):
+        return self.__block
 
     def is_found(self, db):
         return db.search(Query().text.matches(self.text))

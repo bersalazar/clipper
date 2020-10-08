@@ -41,7 +41,8 @@ logger.info("Inserting records to the db...")
 db.insert_multiple({
     'book': quote.book, 
     'author': quote.author,
-    'text': quote.text
+    'text': quote.text,
+    'block': quote.block
 } for quote in quotes)
 
 # if arg is print then read db.json and generate pdf
