@@ -14,7 +14,7 @@ def parse_author(data):
         author = regex.search(data)
         return author.group(0)
     except AttributeError:
-        logger.error('Unable to parse author. Setting as empty...')
+        logger.warning('Unable to parse author. Setting as empty...')
         return ''
 
 
