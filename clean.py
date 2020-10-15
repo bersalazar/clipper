@@ -17,5 +17,6 @@ for quote in TinyDB(args.source):
         duplicates.append(quote.doc_id-1)
     previous_quote = quote['text']
 
+duplicates.pop(0)
 db.remove(doc_ids=duplicates)
 logger.info(f'Removed {len(duplicates)} duplicate records')

@@ -19,8 +19,8 @@ if not os.path.isfile(args.source):
     exit() 
 
 for quote in TinyDB(args.source):
-    document.append(Paragraph(f"{quote['book']} by {quote['author']}", ParagraphStyle('bold')))
-    document.append(Paragraph(quote['text']))
+    document.append(Paragraph(f"{quote['book']} by {quote['author']} ({quote.doc_id})", ParagraphStyle('bold')))
+    document.append(Paragraph(f"{quote['text']}"))
     document.append(Spacer(1, 20))
 
 SimpleDocTemplate(args.output, pagesize=letter).build(document)
