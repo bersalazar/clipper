@@ -24,3 +24,4 @@ for quote in TinyDB(args.source):
     document.append(Spacer(1, 20))
 
 SimpleDocTemplate(args.output, pagesize=letter).build(document)
+logger.info(f'Successfully created {args.output}')
