@@ -18,10 +18,15 @@ if not os.path.isfile(args.source):
     logger.error(f'database does not exist at {args.source}')
     exit() 
 
+previous_book = ''
 for quote in TinyDB(args.source):
-    document.append(Paragraph(f"{quote['book']} by {quote['author']} ({quote.doc_id})", ParagraphStyle('bold')))
-    document.append(Paragraph(f"{quote['text']}"))
+    if previous_book != quote['book']:
+        document.append(Spacer(1, 10))
+        document.append(Paragraph(f"{quote['book']}"))
+        document.append(Paragraph(f"by {quote['author']}"))
+    document.append(Paragraph(f"- {quote['text']} ({quote.doc_id})"))
     document.append(Spacer(1, 20))
+    previous_book = quote['book']
 
 SimpleDocTemplate(args.output, pagesize=letter).build(document)
 logger.info(f'Successfully created {args.output}')
