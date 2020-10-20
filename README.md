@@ -1,3 +1,3 @@
-A simple script to parse a Kindle Paperwhite's My Clippings.txt file in JSON (TinyDB) format.
+A set of scripts to parse and manipulate the Kindle Paperwhite's clippings file.
 
-Also has another script to output to PDF.
+It reads the My Clippings.txt file, adds it to a local TinyDB and creates a readable PDF output.
