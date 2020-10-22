@@ -27,9 +27,6 @@ text_style.fontSize = 10
 previous_book = ''
 document = [Spacer(1,1)]
 for quote in TinyDB(args.source):
-    #if previous_book != quote['book']:
-    #    document.append(Paragraph(f"{quote['book']}"))
-    #    document.append(Paragraph(f"by {quote['author']}"))
     document.append(Paragraph(f"{quote['text']}", text_style))
     document.append(Paragraph(f"{quote['book']} by {quote['author']} [{quote.doc_id}]", author_style))
     document.append(Spacer(1, 10))
