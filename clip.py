@@ -23,7 +23,6 @@ db_path = './db.json'
 if os.path.isfile(db_path):
     os.remove('./db.json') 
 db = TinyDB(db_path)
-
 quotes = []
 for clip in clips:
     quotes.append(Quote(clip))
