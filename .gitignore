@@ -142,4 +142,6 @@ cython_debug/
 .vscode
 db.json
 *.pdf
-My Clippings.txt
+My Clippings*
+*clippings*
+asd.txt
