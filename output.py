@@ -1,6 +1,7 @@
 import os
 import argparse
-from model import Quote, logger
+import logging
+from model import Quote
 from tinydb import TinyDB, Query
 
 from reportlab.pdfgen import canvas
@@ -8,6 +9,9 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_JUSTIFY
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--output', '-o', help='output file name', default='./quotes.pdf')

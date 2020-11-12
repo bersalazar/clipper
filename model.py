@@ -3,18 +3,13 @@ import sys
 import logging
 from tinydb import Query
 
-logging.basicConfig(filename='app.log', level=logging.INFO)
-logger = logging.getLogger()
-logger.addHandler(logging.StreamHandler(sys.stdout))
-
-
 def parse_author(data):
     regex = re.compile(r'(?<=\().*(?=\))')
     try:
         author = regex.search(data)
         return author.group(0)
     except AttributeError:
-        logger.warning('Unable to parse author. Setting as empty...')
+        #logger.warning('Unable to parse author. Setting as empty...')
         return ''
 
 

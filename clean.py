@@ -1,8 +1,12 @@
 import os
 import argparse
-from model import Quote, logger
+import logging
+from model import Quote
 from tinydb import TinyDB, Query, where
 from config import config
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--key', '-k', help='clean a single quote by its ID')
