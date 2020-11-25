@@ -1,3 +1,3 @@
 config = {
-    'database_path': './db.json'
+    'database_path': './alternate-db.json'
 }
