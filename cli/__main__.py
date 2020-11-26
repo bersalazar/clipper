@@ -7,20 +7,23 @@ from config import *
 
 def get_args():
     arg_parser = ArgumentParser(epilog='Example usage: ')
-    #arg_parser.add_argument('--path', '-p', help='the path to the clippings file')
-    arg_parser.add_argument('--clean', '-c', help='the path to the clippings file')
-    arg_parser.add_argument('--key', '-k', help='clean a single quote by its ID')
-    args = arg_parser.parse_args()
-    return args
+    subparsers = arg_parser.add_subparsers(help='sub-command help')
+
+    parser_clean = subparsers.add_parser('clean', help='cleans the clips db')
+    parser_clean.add_argument('key', help='the key of the clip')
+    
+    parser_clip = subparsers.add_parser('clip', help='goes through the file and clips quotes')
+    parser_clip.add_argument('file', help='the file to clip')
+
+    return arg_parser.parse_args()
 
 def main():
     args = get_args()
     logging.basicConfig(level=logging.INFO)
-    print(f'Using {config.get("database_path")} database')
-    #args = sys.argv[1:]
 
-    print(args)
-    if args.clean:
+    print(f'Using {config.get("database_path")} database')
+
+    if args.key:
         clean(args)
         print("CLEAN!")
 
