@@ -1,5 +1,5 @@
 import os
-import argparse
+import logging
 from model import Quote
 from tinydb import TinyDB, Query
 
@@ -9,13 +9,10 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_JUSTIFY
 
-arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('--output', '-o', help='output file name', default='./quotes.pdf')
-arg_parser.add_argument('--source', '-s', help='path to the source db', default='./db.json')
-arg_parser.add_argument('--txt', '-t', action="store_true", help='output as a My Clippings.txt file', default=False)
-args = arg_parser.parse_args()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
-if (not args.txt):
+def output_as_pdf(args):
     if not os.path.isfile(args.source):
         logger.error(f'database does not exist at {args.source}')
         exit() 
@@ -37,7 +34,9 @@ if (not args.txt):
     doc = SimpleDocTemplate(args.output, pagesize=letter)
     doc.build(document)
     logger.info(f'Successfully created {args.output}')
-else:
+
+
+def output_text_file():
     output_file = './new_clippings.txt' 
     if os.path.isfile(output_file):
         os.remove(output_file) 
