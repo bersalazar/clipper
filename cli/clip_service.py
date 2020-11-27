@@ -1,14 +1,16 @@
 import os
-import argparse
+
+from logger import logger
 from model import Quote
-from tinydb import TinyDB, Query
+from tinydb import TinyDB
 
 db_path = './alternate-db.json'
+
 
 def read_file(path):
     block = []
     clips = []
-    
+
     f = open(path, 'r', encoding='utf-8-sig')
     for line in f:
         if line.startswith('='):
@@ -19,9 +21,10 @@ def read_file(path):
     f.close()
     return clips
 
+
 def process_clippings(path):
     if os.path.isfile(db_path):
-        os.remove(db_path) 
+        os.remove(db_path)
     db = TinyDB(db_path)
 
     quotes = []
@@ -29,10 +32,10 @@ def process_clippings(path):
 
     for clip in clips:
         quotes.append(Quote(clip))
-#    logger.info("Parsed quotes from clippings")
-    
+    logger.info("Parsed quotes from clippings")
+
     db.insert_multiple({
-        'book': quote.book, 
+        'book': quote.book,
         'author': quote.author,
         'text': quote.text,
         'block': quote.block

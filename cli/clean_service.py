@@ -1,14 +1,10 @@
-import os
-import logging
-from model import Quote
-from tinydb import TinyDB, Query, where
+from logger import logger
+from tinydb import TinyDB
 from config import config
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
 
 db_path = config['database_path']
 db = TinyDB(db_path)
+
 
 def clean_by_key(args):
     try:
@@ -16,6 +12,7 @@ def clean_by_key(args):
         logger.info(f'Removed quote with ID {args.key}')
     except KeyError as ex:
         logger.error('The specified key was not found', ex)
+
 
 def clean_by_list(args):
     f = open(args.list, 'r', encoding='utf-8-sig')
@@ -27,6 +24,7 @@ def clean_by_list(args):
         except KeyError as ex:
             logger.error(f'Key {ex} was not found ')
     f.close()
+
 
 def clean_duplicates():
     previous_quote = ''

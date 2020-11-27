@@ -1,6 +1,7 @@
 import re
 import sys
-import logging
+
+from logger import logger
 from tinydb import Query
 
 def parse_author(data):
