@@ -3,8 +3,9 @@ import os
 from logger import logger
 from model import Quote
 from tinydb import TinyDB
+from config import config
 
-db_path = './alternate-db.json'
+db_path = config['database_path']
 
 
 def read_file(path):

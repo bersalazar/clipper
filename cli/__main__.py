@@ -4,7 +4,7 @@ from logger import logger
 from config import config
 from .clip_service import process_clippings
 from .clean_service import clean_by_key, clean_by_list, clean_duplicates
-from .output_service import output_text_file, output_as_pdf
+from .output_service import output_text_file, output_as_pdf, output_starred_as_pdf
 
 
 def get_args():
@@ -22,6 +22,9 @@ def get_args():
     parser_output = subparsers.add_parser('output', help='creates an output file of the clippings database')
     parser_output.add_argument('--text', action='store_true', help='in a kindle clippings text file')
     parser_output.add_argument('--pdf', action='store_true', help='in a pdf file')
+    parser_output.add_argument('--starred', nargs='?', help='starred quotes from a file in a pdf file')
+
+    parser_clip = subparsers.add_parser('fetch', help='fetch the My Clippings.txt file from kindle')
 
     return arg_parser.parse_args()
 
@@ -38,7 +41,6 @@ def main():
             logger.info("BY LIST!")
             clean_by_list(args)
         else:
-            logger.info("BY DUPES")
             clean_duplicates()
     elif args.subcommand == 'output':
         if args.text:
@@ -47,10 +49,14 @@ def main():
         elif args.pdf:
             logger.info("PDF")
             output_as_pdf()
+        elif args.starred:
+            output_starred_as_pdf()
     elif args.subcommand == 'clip':
         if args.file:
             logger.info('clipping the file')
             process_clippings(args.file)
+    elif args.subcommand == 'fetch':
+        logger.info("copying from Kindle: My Clippings.txt file")
 
 
 if __name__ == '__main__':

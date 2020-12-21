@@ -29,6 +29,7 @@ def clean_by_list(args):
 def clean_duplicates():
     previous_quote = ''
     duplicates = []
+    logger.info('Cleaning duplicates...')
     for quote in db:
         if quote['text'].startswith(previous_quote[:25]):
             duplicates.append(quote.doc_id-1)

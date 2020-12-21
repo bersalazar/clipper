@@ -1,8 +1,8 @@
 import re
-import sys
 
 from logger import logger
 from tinydb import Query
+
 
 def parse_author(data):
     regex = re.compile(r'(?<=\().*(?=\))')
@@ -10,7 +10,7 @@ def parse_author(data):
         author = regex.search(data)
         return author.group(0)
     except AttributeError:
-        #logger.warning('Unable to parse author. Setting as empty...')
+        logger.warning('Unable to parse author. Setting as empty...')
         return ''
 
 
@@ -23,7 +23,6 @@ class Quote:
         self.__text = block[3]
         self.__block = block
 
-
     @property
     def author(self):
         return self.__author
@@ -35,7 +34,7 @@ class Quote:
     @property
     def text(self):
         return self.__text
-     
+
     @property
     def block(self):
         return self.__block
