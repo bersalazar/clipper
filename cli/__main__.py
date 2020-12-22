@@ -9,8 +9,7 @@ from .output_service import output_text_file, output_as_pdf, output_starred_as_p
 
 def get_args():
     arg_parser = ArgumentParser(epilog='Example usage: ')
-    subparsers = arg_parser.add_subparsers(dest='subcommand',
-                                           help='sub-command help')
+    subparsers = arg_parser.add_subparsers(dest='subcommand', help='sub-command help')
 
     parser_clean = subparsers.add_parser('clean', help='cleans the clips db')
     parser_clean.add_argument('--key', nargs='?', help='the key of the clip')
@@ -35,26 +34,20 @@ def main():
     print(f'Using {config.get("database_path")} database')
     if args.subcommand == 'clean':
         if args.key:
-            logger.info("CLEAN!")
             clean_by_key(args)
         elif args.list:
-            logger.info("BY LIST!")
             clean_by_list(args)
         else:
             clean_duplicates()
     elif args.subcommand == 'output':
         if args.text:
-            logger.info("TEXT!")
             output_text_file()
         elif args.pdf:
-            logger.info("PDF")
             output_as_pdf()
         elif args.starred:
             output_starred_as_pdf()
     elif args.subcommand == 'clip':
-        if args.file:
-            logger.info('clipping the file')
-            process_clippings(args.file)
+        process_clippings(args.file)
     elif args.subcommand == 'fetch':
         logger.info("copying from Kindle: My Clippings.txt file")
 

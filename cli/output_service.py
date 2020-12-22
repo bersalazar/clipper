@@ -2,7 +2,7 @@ import os
 import logging
 
 from config import config
-from tinydb import TinyDB, where
+from tinydb import TinyDB
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
