@@ -13,7 +13,7 @@ def get_args():
 
     parser_clean = subparsers.add_parser('clean', help='cleans the clips db')
     parser_clean.add_argument('--key', nargs='?', help='the key of the clip')
-    parser_clean.add_argument('--list', nargs='?', help='a list of keys of clips')
+    parser_clean.add_argument('--list', help='the file holding a list of keys of clips to clean')
 
     parser_clip = subparsers.add_parser('clip', help='goes through the file and clips quotes')
     parser_clip.add_argument('--file', help='the file to clip')
@@ -28,17 +28,27 @@ def get_args():
     return arg_parser.parse_args()
 
 
+def print_usage():
+    print("usage")
+
+
 def main():
     args = get_args()
+
+    if args.subcommand not in ['clean', 'output', 'clip', 'fetch']:
+        print_usage()
+        exit(0)
 
     print(f'Using {config.get("database_path")} database')
     if args.subcommand == 'clean':
         if args.key:
             clean_by_key(args)
         elif args.list:
-            clean_by_list(args)
+            logger.info("this is not working well because the indexes have changed after cleanup")
+            # clean_by_list(args.list)
         else:
             clean_duplicates()
+
     elif args.subcommand == 'output':
         if args.text:
             output_text_file()
@@ -46,8 +56,15 @@ def main():
             output_as_pdf()
         elif args.starred:
             output_starred_as_pdf()
+
     elif args.subcommand == 'clip':
+        if not args.file:
+            logger.error("A file needs to be specified")
+            print_usage()
+
         process_clippings(args.file)
+        clean_duplicates()
+
     elif args.subcommand == 'fetch':
         logger.info("copying from Kindle: My Clippings.txt file")
 

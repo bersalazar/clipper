@@ -42,3 +42,4 @@ def process_clippings(path):
         'block': quote.block
     } for quote in quotes)
     logger.info("Inserted all records to the db")
+    db.close()

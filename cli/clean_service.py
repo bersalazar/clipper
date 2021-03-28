@@ -14,8 +14,8 @@ def clean_by_key(args):
         logger.error('The specified key was not found', ex)
 
 
-def clean_by_list(args):
-    f = open(args.list, 'r', encoding='utf-8-sig')
+def clean_by_list(list_file):
+    f = open(list_file, 'r', encoding='utf-8-sig')
     for line in f:
         try:
             key = int(line)
