@@ -19,7 +19,7 @@ def check_database_path():
         exit()
 
 
-def output_starred_as_pdf():
+def starred_as_pdf():
     check_database_path()
     db = TinyDB(config['database_path'])
 
@@ -53,7 +53,7 @@ def output_starred_as_pdf():
     logger.info(f'Successfully created {output_path}')
 
 
-def output_as_pdf():
+def as_pdf():
     check_database_path()
     author_style = ParagraphStyle('source')
     author_style.fontSize = 7
@@ -74,7 +74,7 @@ def output_as_pdf():
     logger.info(f'Successfully created {pdf_output_path}')
 
 
-def output_text_file():
+def text_file():
     output_file = config['new_clippings_file']
     logger.info(f'Outputting to {output_file}')
     if os.path.isfile(output_file):

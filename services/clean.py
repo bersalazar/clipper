@@ -6,7 +6,7 @@ db_path = config['database_path']
 db = TinyDB(db_path)
 
 
-def clean_by_key(args):
+def by_key(args):
     try:
         db.remove(doc_ids=[int(args.key)])
         logger.info(f'Removed quote with ID {args.key}')
@@ -14,7 +14,7 @@ def clean_by_key(args):
         logger.error('The specified key was not found', ex)
 
 
-def clean_by_list(list_file):
+def by_list(list_file):
     f = open(list_file, 'r', encoding='utf-8-sig')
     for line in f:
         try:
@@ -26,7 +26,7 @@ def clean_by_list(list_file):
     f.close()
 
 
-def clean_duplicates():
+def duplicates():
     previous_quote = ''
     duplicates = []
     logger.info('Cleaning duplicates...')

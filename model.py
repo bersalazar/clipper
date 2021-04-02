@@ -1,7 +1,8 @@
 import re
 
-from logger import logger
 from tinydb import Query
+
+from logger import logger
 
 
 def parse_author(data):
@@ -10,7 +11,7 @@ def parse_author(data):
         author = regex.search(data)
         return author.group(0)
     except AttributeError:
-        logger.warning('Unable to parse author. Setting as empty...')
+        logger.warning(f'Unable to parse author from {data}')
         return ''
 
 
