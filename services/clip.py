@@ -25,8 +25,6 @@ def read_file(path):
 
 
 def process(path):
-    if os.path.isfile(db_path):
-        os.remove(db_path)
     db = TinyDB(db_path)
 
     quotes = []
@@ -43,4 +41,5 @@ def process(path):
         'block': quote.block
     } for quote in quotes)
     logger.info("Inserted all records to the db")
+
     db.close()

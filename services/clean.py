@@ -3,12 +3,13 @@ from tinydb import TinyDB
 from config import config
 
 db_path = config['database_path']
-db = TinyDB(db_path)
+
+duplicate_threshold = 25
 
 
 def by_key(args):
     try:
-        db.remove(doc_ids=[int(args.key)])
+        TinyDB(db_path).remove(doc_ids=[int(args.key)])
         logger.info(f'Removed quote with ID {args.key}')
     except KeyError as ex:
         logger.error('The specified key was not found', ex)
@@ -19,7 +20,7 @@ def by_list(list_file):
     for line in f:
         try:
             key = int(line)
-            db.remove(doc_ids=[key])
+            TinyDB(db_path).remove(doc_ids=[key])
             logger.info(f'Removed {key}')
         except KeyError as ex:
             logger.error(f'Key {ex} was not found ')
@@ -27,13 +28,15 @@ def by_list(list_file):
 
 
 def duplicates():
+    db = TinyDB(db_path)
     previous_quote = ''
     duplicates = []
     logger.info('Cleaning duplicates...')
     for quote in db:
-        if quote['text'].startswith(previous_quote[:25]):
+        if quote['text'].startswith(previous_quote[:duplicate_threshold]):
             duplicates.append(quote.doc_id-1)
         previous_quote = quote['text']
     duplicates.pop(0)
     db.remove(doc_ids=duplicates)
     logger.info(f'Removed {len(duplicates)} duplicate records')
+    db.close()

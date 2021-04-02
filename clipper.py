@@ -1,4 +1,4 @@
-import json
+import os
 
 from argparse import ArgumentParser
 
@@ -39,9 +39,6 @@ def main():
     if not args.subcommand:
         arg_parser.print_help()
 
-    # Print configuration values
-    print(json.dumps(config, indent=4))
-
     if args.subcommand == 'clean':
         if args.key:
             clean.by_key(args)
@@ -54,14 +51,14 @@ def main():
     elif args.subcommand == 'output':
         if args.text:
             output.text_file()
-        elif args.pdf:
-            output.as_pdf()
         elif args.starred:
             output.starred_as_pdf()
+        else:
+            output.as_pdf()
 
     elif args.subcommand == 'clip':
-        if not args.file:
-            logger.error("A file needs to be specified")
+        if os.path.isfile(config['database_path']):
+            os.remove(config['database_path'])
 
         clip.process(args.file)
         clean.duplicates()
