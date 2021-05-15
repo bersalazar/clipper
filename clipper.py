@@ -1,13 +1,8 @@
-import os
-
 from argparse import ArgumentParser
-
-from config import config
 
 import services.clip as clip
 import services.clean as clean
 import services.output as output
-
 from logger import logger
 
 arg_parser = ArgumentParser()
@@ -57,11 +52,7 @@ def main():
             output.as_pdf()
 
     elif args.subcommand == 'clip':
-        if os.path.isfile(config['database_path']):
-            os.remove(config['database_path'])
-
         clip.process(args.file)
-        clean.duplicates()
 
     elif args.subcommand == 'fetch':
         logger.info("copying from Kindle: My Clippings.txt file")

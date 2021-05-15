@@ -1,2 +1,3 @@
-tinydb
+mariadb
+python-dotenv
 reportlab

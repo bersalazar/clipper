@@ -1,0 +1,2 @@
+class QuoteAlreadExistsException(Exception):
+    pass
