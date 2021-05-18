@@ -39,17 +39,17 @@ def parse_clippings_file(path):
 
 
 def insert_author(author):
-    max_id_sql = "SELECT max(AuthorId) FROM kindle.Author"
+    max_id_sql = "SELECT max(AuthorId) FROM Author"
     result = db.query(max_id_sql)
 
     author_id = int(result[0][0])+1
-    db.query(f'INSERT INTO kindle.Author (AuthorId, Name) VALUES ({author_id}, "{author}")')
+    db.query(f'INSERT INTO Author (AuthorId, Name) VALUES ({author_id}, "{author}")')
 
     return author_id
 
 
 def get_author_id(author):
-    sql = f'SELECT AuthorId FROM kindle.Author WHERE Name="{author}"'
+    sql = f'SELECT AuthorId FROM Author WHERE Name="{author}"'
     result = db.query(sql)
 
     if result:
@@ -61,17 +61,17 @@ def get_author_id(author):
 
 
 def insert_book(book, author_id):
-    sql = "SELECT max(BookId) FROM kindle.Book"
+    sql = "SELECT max(BookId) FROM Book"
     result = db.query(sql)
 
     book_id = int(result[0][0])+1
-    db.query(f'INSERT INTO kindle.Book (Name, AuthorId) VALUES ("{book}", {author_id})')
+    db.query(f'INSERT INTO Book (Name, AuthorId) VALUES ("{book}", {author_id})')
 
     return book_id
 
 
 def get_book_id(book, author):
-    sql = f'SELECT BookId FROM kindle.Book WHERE Name="{book}"'
+    sql = f'SELECT BookId FROM Book WHERE Name="{book}"'
     result = db.query(sql)
 
     if result:
@@ -91,14 +91,14 @@ def clean_quote_text(text):
 
 def insert_quote(author_id, book_id, quote):
     text = clean_quote_text(quote.text)
-    sql = f'SELECT QuoteId FROM kindle.Quote WHERE Text="{text}"'
+    sql = f'SELECT QuoteId FROM Quote WHERE Text="{text}"'
     result = db.query(sql)
 
     if result:
         raise QuoteAlreadExistsException()
 
     db.query(f'''
-    INSERT INTO kindle.Quote (Text, DateAdded, Page, Location, BookId, AuthorId)
+    INSERT INTO Quote (Text, DateAdded, Page, Location, BookId, AuthorId)
     VALUES ("{text}", "{quote.date}", "{quote.page}", "{quote.location}", {book_id}, {author_id})
     ''')
 
