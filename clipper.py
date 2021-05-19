@@ -38,8 +38,7 @@ def main():
         if args.key:
             clean.by_key(args)
         elif args.list:
-            logger.info("this is not working well because the indexes have changed after cleanup")
-            # clean_by_list(args.list)
+            clean.by_list(args.list)
         else:
             clean.duplicates()
 
