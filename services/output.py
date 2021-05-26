@@ -45,34 +45,3 @@ def as_pdf():
     doc = SimpleDocTemplate(pdf_output_path, pagesize=letter)
     doc.build(document)
     logger.info(f'Successfully created {pdf_output_path}')
-
-
-#def starred_as_pdf():
-#    f = open('./files/starred_quotes', 'r', encoding='utf-8-sig')
-#    starred_quotes = []
-#
-#    for line in f:
-#        try:
-#            key = int(line)
-#            print(db.get(doc_id=key))
-#            starred_quotes.append(db.get(doc_id=key))
-#        except KeyError as ex:
-#            logger.error('The specified key was not found', ex)
-#
-#    author_style = ParagraphStyle('source')
-#    author_style.fontSize = 7
-#    author_style.textColor = 'grey'
-#    text_style = ParagraphStyle('text')
-#    text_style.alignment = TA_JUSTIFY
-#    text_style.fontSize = 10
-#    document = [Spacer(1, 1)]
-#    for quote in starred_quotes:
-#        document.append(Paragraph(f'{quote["text"]}', text_style))
-#        document.append(Paragraph(f'{quote["author"]} in {quote["book"]} '
-#                                  f'[{quote.doc_id}]', author_style))
-#        document.append(Spacer(1, 10))
-#
-#    output_path = config['starred_pdf_output_path']
-#    doc = SimpleDocTemplate(output_path, pagesize=letter)
-#    doc.build(document)
-#    logger.info(f'Successfully created {output_path}')

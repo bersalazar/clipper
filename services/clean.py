@@ -52,11 +52,9 @@ def by_list(list_file):
 
 
 def duplicates():
-    duplicates = []
     logger.info('Cleaning duplicates...')
 
     quotes = db.query('SELECT QuoteId, Text FROM Quote')
-
     for quote in quotes:
         truncated_quote = quote[1][:duplicate_threshold]
 
@@ -75,7 +73,6 @@ def duplicates():
         duplicate_quotes = db.query(sql)
 
     amount_of_duplicates = len(duplicate_quotes)
-
     if amount_of_duplicates > 0:
         for quote in duplicate_quotes:
             print(f"Quote with ID {quote[0]} is duplicate")
