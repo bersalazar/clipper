@@ -63,16 +63,29 @@ def duplicates():
         sql = f"""
         WITH temp AS
         (
-            SELECT row_number() over (order by QuoteId) RowNumber
+            SELECT QuoteId, Text, row_number() over (order by QuoteId) RowNumber
             FROM Quote
             WHERE Text LIKE \"%{truncated_quote}%\"
         )
         SELECT *
         FROM temp
-        WHERE RowNumber !=1
+        WHERE RowNumber < (SELECT max(RowNumber) FROM temp)
         """
 
         duplicate_quotes = db.query(sql)
-    print(duplicate_quotes)
 
-    logger.info(f'Removed {len(duplicates)} duplicate records')
+    amount_of_duplicates = len(duplicate_quotes)
+
+    if amount_of_duplicates > 0:
+        for quote in duplicate_quotes:
+            print(f"Quote with ID {quote[0]} is duplicate")
+
+        if input("Would you like to remove them? [y/N]: ") == "y":
+            for quote in duplicate_quotes:
+                quote_id = quote[0]
+                sql = f"DELETE FROM Quote WHERE QuoteId = {quote_id}"
+                db.query(sql)
+        else:
+            exit(0)
+
+    logger.info(f'Removed {amount_of_duplicates} duplicate records')

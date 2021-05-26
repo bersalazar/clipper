@@ -108,8 +108,8 @@ class Db:
     def __del__(self):
         self.conn.close()
 
-    def __is_committable_query(self, sql):
-        if sql.startswith('INSERT') or sql.startswith('DELETE') or sql.startswith('UPDATE'):
+    def _is_committable_query(self, sql):
+        if 'INSERT' in sql or 'DELETE' in sql or 'UPDATE' in sql:
             return True
         return False
 
@@ -117,7 +117,7 @@ class Db:
         with self.conn.cursor() as cursor:
             cursor.execute(sql)
             logger.debug(sql)
-            if self.__is_committable_query(sql):
+            if self._is_committable_query(sql):
                 self.conn.commit()
 
             try:
