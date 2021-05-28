@@ -55,6 +55,7 @@ def duplicates():
     logger.info('Cleaning duplicates...')
 
     quotes = db.query('SELECT QuoteId, Text FROM Quote')
+    all_duplicates = []
     for quote in quotes:
         truncated_quote = quote[1][:duplicate_threshold]
 
@@ -70,16 +71,19 @@ def duplicates():
         WHERE RowNumber < (SELECT max(RowNumber) FROM temp)
         """
 
-        duplicate_quotes = db.query(sql)
+        quote_duplicates = db.query(sql)
+        if quote_duplicates:
+            for dupe in quote_duplicates:
+                all_duplicates.append(dupe[0])
 
-    amount_of_duplicates = len(duplicate_quotes)
+    # When a list is passed to set(), only uniques are grabbed
+    unique_duplicates = set(all_duplicates)
+    amount_of_duplicates = len(unique_duplicates)
     if amount_of_duplicates > 0:
-        for quote in duplicate_quotes:
-            print(f"Quote with ID {quote[0]} is duplicate")
+        print(f"All duplicate IDs: {unique_duplicates}")
 
         if input("Would you like to remove them? [y/N]: ") == "y":
-            for quote in duplicate_quotes:
-                quote_id = quote[0]
+            for quote_id in unique_duplicates:
                 sql = f"DELETE FROM Quote WHERE QuoteId = {quote_id}"
                 db.query(sql)
         else:
