@@ -1,6 +1,5 @@
 from logger import logger
 from model import Quote, Db
-from exceptions import QuoteAlreadExistsException
 from config import config
 
 db = Db(
@@ -10,6 +9,9 @@ db = Db(
     user=config['db_user'],
     password=config['db_password']
 )
+
+# Indicates how many characters from a quote should be evaluated before considering it a duplicate
+duplicate_search_substring_threshold = config["duplicate_search_substring_threshold"]
 
 
 def read_file(path):
@@ -27,15 +29,23 @@ def read_file(path):
     return clips
 
 
-def parse_clippings_file(path):
+def process_clippings_file(path):
     quotes = []
     clips = read_file(path)
 
     for clip in clips:
-        quotes.append(Quote(clip))
+        quotes.append(Quote.from_block(clip))
     logger.info(f"Parsed {len(clips)} quotes from {path}")
 
     return quotes
+
+
+def remove_duplicates(quotes):
+    unique_quotes = []
+    for quote in quotes:
+        print(quote.text)
+
+    return unique_quotes
 
 
 def insert_author(author):
@@ -76,7 +86,7 @@ def get_book_id(book, author):
 
     if result:
         book_id = int(result[0][0])
-        logger.info(f"Found book ID for {book}: {book_id}")
+        logger.info(f'Found book ID for {book}: {book_id}')
         return book_id
 
     return insert_book(book, author)
@@ -84,34 +94,89 @@ def get_book_id(book, author):
 
 def clean_quote_text(text):
     text = text.strip()
-    text = text.replace("\"", "")
+    text = add_quote_character_escape(text)
 
     return text
 
 
-def insert_quote(author_id, book_id, quote):
+def insert_quote(author_id, book_id, quote, to_temporary_table=False):
+    table = "Temporary" if to_temporary_table else "Quote"
     text = clean_quote_text(quote.text)
-    sql = f'SELECT QuoteId FROM Quote WHERE Text="{text}"'
-    result = db.query(sql)
-
-    if result:
-        raise QuoteAlreadExistsException()
-
     db.query(f'''
-    INSERT INTO Quote (Text, DateAdded, Page, Location, BookId, AuthorId)
-    VALUES ("{text}", "{quote.date}", "{quote.page}", "{quote.location}", {book_id}, {author_id})
+        INSERT INTO {table} (Text, DateAdded, Page, Location, BookId, AuthorId)
+        VALUES ("{text}", "{quote.date}", "{quote.page}", "{quote.location}", {book_id}, {author_id})
     ''')
 
 
-def process(path):
-    quotes = parse_clippings_file(path)
+def add_quote_character_escape(text):
+    if '\'' in text:
+        text = text.replace('\'', '\\\'')
+    if '\"' in text:
+        text = text.replace('\"', '\\"')
+    return text
 
+
+def get_unique_quote(quote):
+    '''
+    Searches Temporary table for quote duplicates and returns the valid, unique quote, which is the one with the MAX rown number.
+    '''
+    search_substring = quote.text[:duplicate_search_substring_threshold]
+    search_substring = clean_quote_text(search_substring)
+    sql = f"""
+    WITH temp AS
+    (
+        SELECT *, row_number() over (order by QuoteId) RowNumber
+        FROM Temporary
+        WHERE Text LIKE \"%{search_substring}%\"
+    )
+    SELECT *
+    FROM temp
+    WHERE RowNumber = (SELECT max(RowNumber) FROM temp)
+    """
+
+    result = db.query(sql)
+    if result:
+        result_tuple = result[0]
+        return Quote(
+                text=result_tuple[1],
+                date=result_tuple[2],
+                page=result_tuple[3],
+                location=result_tuple[4],
+                book_id=result_tuple[5],
+                author_id=result_tuple[6]
+            )
+    return quote
+
+
+def is_duplicate_quote(quote):
+    clean_text = clean_quote_text(quote.text)
+    sql = f'SELECT QuoteId FROM Quote WHERE Text=\"{clean_text}\"'
+    result = db.query(sql)
+
+    if result:
+        logger.warning(f'DUPLICATE FOUND: {quote.text}')
+        return True
+    return False
+
+
+def clip(path):
+    quotes = process_clippings_file(path)
+
+    # insert all quotes in Temporary table
+    logger.info("Creating temporary table")
     for quote in quotes:
         author_id = get_author_id(quote.author)
         book_id = get_book_id(quote.book, author_id)
-        try:
-            insert_quote(author_id, book_id, quote)
-        except QuoteAlreadExistsException:
-            logger.warning("Quote already exists. Skipping...")
+        insert_quote(author_id, book_id, quote, to_temporary_table=True)
+
+    # insert quotes without duplicates in actual Quote table
+    logger.info("Creating actual Quote table")
+    for quote in quotes:
+        unique_quote = get_unique_quote(quote)
+        if is_duplicate_quote(unique_quote):
+            continue
+        book_id = unique_quote.book_id
+        author_id = unique_quote.author_id
+        insert_quote(author_id, book_id, unique_quote)
 
     logger.info("Inserted records to the DB")

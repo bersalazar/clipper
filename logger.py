@@ -1,5 +1,5 @@
 import logging
 
-FORMAT = '%(asctime)s: %(message)s'
-logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+FORMAT = '%(levelname)s: %(message)s'
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 logger = logging.getLogger()

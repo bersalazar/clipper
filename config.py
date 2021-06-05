@@ -13,5 +13,6 @@ config = {
     'db_user': os.environ['DBUSER'],
     'db_name': os.environ['DBNAME'],
     'db_port': os.environ['DBPORT'],
-    'db_password': os.environ['DBPASSWORD']
+    'db_password': os.environ['DBPASSWORD'],
+    'duplicate_search_substring_threshold': 25
 }

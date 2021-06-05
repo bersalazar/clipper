@@ -48,16 +48,27 @@ def parse_page(data):
 
 
 class Quote:
-    def __init__(self, block):
-        book = block[0][:block[0].find('(')].strip()
+    def __init__(self, text, date, page, location, book_id="", author_id="", author="", book=""):
+        self.__text = text
+        self.__date = date
+        self.__page = page
+        self.__location = location
+        self.__book_id = book_id
+        self.__author_id = author_id
+        self.__author = author
         self.__book = book
-        self.__author = parse_author(block[0])
-        self.__metadata = Metadata(block[2])
-        self.__text = block[3]
-        self.__date = parse_date(block[1])
-        self.__page = parse_page(block[1])
-        self.__location = parse_location(block[1])
-        self.__block = block
+
+    @classmethod
+    def from_block(cls, block):
+        book = block[0][:block[0].find('(')].strip()
+        return cls(
+            text=block[3],
+            date=parse_date(block[1]),
+            page=parse_page(block[1]),
+            location=parse_location(block[1]),
+            author=parse_author(block[0]),
+            book=book
+        )
 
     @property
     def author(self):
@@ -83,15 +94,16 @@ class Quote:
     def location(self):
         return self.__location
 
-    #def is_found(self, db):
-    #    return db.search(Query().text.matches(self.text))
+    @property
+    def book_id(self):
+        return self.__book_id
 
+    @property
+    def author_id(self):
+        return self.__author_id
 
-class Metadata:
-    def __init__(self, data):
-        self._page = data[0]
-        self._location = data[0]
-        self._timestamp = data[0]
+    def __repr__(self):
+        return f'Quote({self.text}, {self.date}, {self.page}, {self.location}, {self.author_id}, {self.book_id})'
 
 
 class Db:
@@ -115,8 +127,8 @@ class Db:
 
     def query(self, sql):
         with self.conn.cursor() as cursor:
-            cursor.execute(sql)
             logger.debug(sql)
+            cursor.execute(sql)
             if self._is_committable_query(sql):
                 self.conn.commit()
 

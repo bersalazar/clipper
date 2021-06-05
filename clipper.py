@@ -12,15 +12,13 @@ def get_args():
     subparsers = arg_parser.add_subparsers(dest='subcommand', help='sub-command help')
 
     parser_clip = subparsers.add_parser('clip', help='Reads the specified file and clips quotes')
-    parser_clip.add_argument('--file', help='Path to the local file to clip', required=True)
+    parser_clip.add_argument('--file', help='Path to the local file to clip', nargs='?', default="files/My Clippings.txt")
 
     parser_clean = subparsers.add_parser('clean', help='Cleans the clips DB. Default is to clean duplicates')
     parser_clean.add_argument('--key', nargs='?', help='ID of the quote to clean')
     parser_clean.add_argument('--list', help='Path to the file holding a list of quote IDs to clean')
 
-    parser_output = subparsers.add_parser('output', help='Creates an output file of the quotes database')
-    parser_output.add_argument('--text', action='store_true', help='in a kindle clippings text file')
-    parser_output.add_argument('--pdf', action='store_true', help='in a pdf file')
+    parser_output = subparsers.add_parser('output', help='Creates an readable PDF file of the quotes database')
 
     parser_clip = subparsers.add_parser('fetch', help='TODO: Fetch the My Clippings.txt file from kindle and store it in files/. It also creates a backup copy of the existing one.')
 
@@ -40,16 +38,9 @@ def main():
         else:
             clean.duplicates()
     elif args.subcommand == 'output':
-        if args.text:
-            output.text_file()
-        else:
-            output.as_pdf()
+        output.as_pdf()
     elif args.subcommand == 'clip':
-        clip.process(args.file)
+        clip.clip(args.file)
     elif args.subcommand == 'fetch':
         logger.info("TODO: copying from Kindle: My Clippings.txt file")
         # TODO: copy from the usual directory where My Clippings.txt file resides
-
-
-if __name__ == '__main__':
-    main()

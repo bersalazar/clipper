@@ -12,9 +12,6 @@ db = Db(
     password=config['db_password']
 )
 
-# Indicates how many characters from a quote should be evaluated before considering it a duplicate
-duplicate_threshold = 25
-
 
 def is_valid_quote_id(quote_id):
     regex = re.compile(r'[1-9]+|[1-9]+[0-9]+')
@@ -51,30 +48,38 @@ def by_list(list_file):
     f.close()
 
 
+def search_quote_duplicates(quote):
+    '''
+    Searches and returns all the duplicates for a single quote.
+    '''
+    search_substring = quote[1][:config['duplicate_search_substring_threshold']]
+    sql = f"""
+    WITH temp AS
+    (
+        SELECT QuoteId, Text, row_number() over (order by QuoteId) RowNumber
+        FROM Quote
+        WHERE Text LIKE \"%{search_substring}%\"
+    )
+    SELECT *
+    FROM temp
+    WHERE RowNumber < (SELECT max(RowNumber) FROM temp)
+    """
+
+    return db.query(sql)
+
+
 def duplicates():
+    '''
+    Cleans the database from duplicates. Grabs each quote and searches other occurences based on a threshold value.
+    '''
     logger.info('Cleaning duplicates...')
 
-    quotes = db.query('SELECT QuoteId, Text FROM Quote')
     all_duplicates = []
-    for quote in quotes:
-        truncated_quote = quote[1][:duplicate_threshold]
-
-        sql = f"""
-        WITH temp AS
-        (
-            SELECT QuoteId, Text, row_number() over (order by QuoteId) RowNumber
-            FROM Quote
-            WHERE Text LIKE \"%{truncated_quote}%\"
-        )
-        SELECT *
-        FROM temp
-        WHERE RowNumber < (SELECT max(RowNumber) FROM temp)
-        """
-
-        quote_duplicates = db.query(sql)
+    for quote in get_all_quotes():
+        quote_duplicates = search_quote_duplicates(quote)
         if quote_duplicates:
-            for dupe in quote_duplicates:
-                all_duplicates.append(dupe[0])
+            for duplicate in quote_duplicates:
+                all_duplicates.append(duplicate[0])
 
     # When a list is passed to set(), only uniques are grabbed
     unique_duplicates = set(all_duplicates)
