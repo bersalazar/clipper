@@ -16,7 +16,17 @@ db = Db(
 )
 
 
-def as_pdf():
+def by_titles(titles):
+    pass
+
+
+def all():
+    sql = 'SELECT QuoteId, BookId, AuthorId, Text FROM Quote'
+    quotes = db.query(sql)
+    generate_pdf(quotes)
+
+
+def generate_pdf(quotes):
     author_style = ParagraphStyle('source')
     author_style.fontSize = 7
     author_style.textColor = 'grey'
@@ -24,9 +34,6 @@ def as_pdf():
     text_style.alignment = TA_JUSTIFY
     text_style.fontSize = 10
     document = [Spacer(1, 1)]
-
-    sql = 'SELECT QuoteId, BookId, AuthorId, Text FROM Quote'
-    quotes = db.query(sql)
 
     for quote in quotes:
         book_name_sql = f'SELECT Name FROM Book WHERE BookId = {quote[1]}'
@@ -40,8 +47,7 @@ def as_pdf():
                                   f'[{quote[0]}]', author_style))
         document.append(Spacer(1, 10))
 
-        pdf_output_path = config['pdf_output_path']
-
+    pdf_output_path = config['pdf_output_path']
     doc = SimpleDocTemplate(pdf_output_path, pagesize=letter)
     doc.build(document)
     logger.info(f'Successfully created {pdf_output_path}')

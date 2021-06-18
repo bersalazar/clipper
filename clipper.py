@@ -19,6 +19,7 @@ def get_args():
     parser_clean.add_argument('--list', help='Path to the file holding a list of quote IDs to clean')
 
     parser_output = subparsers.add_parser('output', help='Creates an readable PDF file of the quotes database')
+    parser_output.add_argument('--titles', nargs='?', help='List of IDs of book titles to output')
 
     parser_clip = subparsers.add_parser('fetch', help='TODO: Fetch the My Clippings.txt file from kindle and store it in files/. It also creates a backup copy of the existing one.')
 
@@ -38,7 +39,11 @@ def main():
         else:
             clean.duplicates()
     elif args.subcommand == 'output':
-        output.as_pdf()
+        if args.titles:
+            print("By titles" + args.title)
+            output.by_titles(args.titles)
+        else:
+            output.all()
     elif args.subcommand == 'clip':
         clip.clip(args.file)
     elif args.subcommand == 'fetch':
