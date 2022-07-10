@@ -161,22 +161,4 @@ def is_duplicate_quote(quote):
 
 def clip(path):
     quotes = process_clippings_file(path)
-
-    # insert all quotes in Temporary table
-    logger.info("Creating temporary table")
-    for quote in quotes:
-        author_id = get_author_id(quote.author)
-        book_id = get_book_id(quote.book, author_id)
-        insert_quote(author_id, book_id, quote, to_temporary_table=True)
-
-    # insert quotes without duplicates in actual Quote table
-    logger.info("Creating actual Quote table")
-    for quote in quotes:
-        unique_quote = get_unique_quote(quote)
-        if is_duplicate_quote(unique_quote):
-            continue
-        book_id = unique_quote.book_id
-        author_id = unique_quote.author_id
-        insert_quote(author_id, book_id, unique_quote)
-
-    logger.info("Inserted records to the DB")
+    print(quotes[22].as_json())

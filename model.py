@@ -1,5 +1,6 @@
 import re
 import mariadb
+import json
 
 from logger import logger
 from datetime import datetime
@@ -104,6 +105,18 @@ class Quote:
 
     def __repr__(self):
         return f'Quote({self.text}, {self.date}, {self.page}, {self.location}, {self.author_id}, {self.book_id})'
+
+    def as_json(self):
+        return json.dumps({
+            "text": self.__text,
+            "date": self.__date.strftime("%Y%m%d"),
+            "page": self.__page,
+            "location": self.__location,
+            "book_id": self.__book_id,
+            "author_id": self.__author_id,
+            "author": self.__author,
+            "book": self.__book
+        })
 
 
 class Db:
