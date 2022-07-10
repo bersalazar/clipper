@@ -7,49 +7,51 @@ from datetime import datetime
 
 
 def parse_author(data):
-    regex = re.compile(r'(?<=\().*(?=\))')
+    regex = re.compile(r"(?<=\().*(?=\))")
     try:
         author = regex.search(data)
         return author.group(0)
     except AttributeError:
-        #logger.debug(f'Unable to parse author from {data}')
-        return ''
+        # logger.debug(f'Unable to parse author from {data}')
+        return ""
 
 
 def parse_location(data):
-    regex = re.compile(r'Location [0-9]+-[0-9]+|Location [0-9]+')
+    regex = re.compile(r"Location [0-9]+-[0-9]+|Location [0-9]+")
     try:
         result = regex.search(data).group(0)
-        location = result[result.find(" "):].strip()
+        location = result[result.find(" ") :].strip()
         return location
     except AttributeError:
-        #logger.debug(f'Unable to parse location from {data}')
-        return ''
+        # logger.debug(f'Unable to parse location from {data}')
+        return ""
 
 
 def parse_date(data):
-    regex = re.compile(r'[A-Za-z]+, [A-Za-z]+ [0-9]+, [0-9]+')
+    regex = re.compile(r"[A-Za-z]+, [A-Za-z]+ [0-9]+, [0-9]+")
     try:
         date = regex.search(data)
-        return datetime.strptime(date.group(0), '%A, %B %d, %Y').date()
+        return datetime.strptime(date.group(0), "%A, %B %d, %Y").date()
     except AttributeError:
-        #logger.debug(f'Unable to parse date from {data}')
-        return ''
+        # logger.debug(f'Unable to parse date from {data}')
+        return ""
 
 
 def parse_page(data):
-    regex = re.compile(r'page [0-9]+')
+    regex = re.compile(r"page [0-9]+")
     try:
         result = regex.search(data).group(0)
-        page = result[result.find(" "):].strip()
+        page = result[result.find(" ") :].strip()
         return page
     except AttributeError:
-        #logger.debug(f'Unable to parse page from {data}')
+        # logger.debug(f'Unable to parse page from {data}')
         return 0
 
 
 class Quote:
-    def __init__(self, text, date, page, location, book_id="", author_id="", author="", book=""):
+    def __init__(
+        self, text, date, page, location, book_id="", author_id="", author="", book=""
+    ):
         self.__text = text
         self.__date = date
         self.__page = page
@@ -61,14 +63,14 @@ class Quote:
 
     @classmethod
     def from_block(cls, block):
-        book = block[0][:block[0].find('(')].strip()
+        book = block[0][: block[0].find("(")].strip()
         return cls(
             text=block[3],
             date=parse_date(block[1]),
             page=parse_page(block[1]),
             location=parse_location(block[1]),
             author=parse_author(block[0]),
-            book=book
+            book=book,
         )
 
     @property
@@ -104,37 +106,35 @@ class Quote:
         return self.__author_id
 
     def __repr__(self):
-        return f'Quote({self.text}, {self.date}, {self.page}, {self.location}, {self.author_id}, {self.book_id})'
+        return f"Quote({self.text}, {self.date}, {self.page}, {self.location}, {self.author_id}, {self.book_id})"
 
     def as_json(self):
-        return json.dumps({
-            "text": self.__text,
-            "date": self.__date.strftime("%Y%m%d"),
-            "page": self.__page,
-            "location": self.__location,
-            "book_id": self.__book_id,
-            "author_id": self.__author_id,
-            "author": self.__author,
-            "book": self.__book
-        })
+        return json.dumps(
+            {
+                "text": self.__text,
+                "date": self.__date.strftime("%Y%m%d"),
+                "page": self.__page,
+                "location": self.__location,
+                "book_id": self.__book_id,
+                "author_id": self.__author_id,
+                "author": self.__author,
+                "book": self.__book,
+            }
+        )
 
 
 class Db:
     def __init__(self, host, database, port, user, password):
         port = int(port) if type(port) is not int else port
         self.conn = mariadb.connect(
-            host=host,
-            database=database,
-            port=port,
-            user=user,
-            password=password
+            host=host, database=database, port=port, user=user, password=password
         )
 
     def __del__(self):
         self.conn.close()
 
     def _is_committable_query(self, sql):
-        if 'INSERT' in sql or 'DELETE' in sql or 'UPDATE' in sql:
+        if "INSERT" in sql or "DELETE" in sql or "UPDATE" in sql:
             return True
         return False
 

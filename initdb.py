@@ -6,11 +6,11 @@ from config import config
 
 try:
     conn = mariadb.connect(
-        host=config['db_host'],
-        database=config['db_name'],
-        port=int(config['db_port']),
-        user=config['db_user'],
-        password=config['db_password']
+        host=config["db_host"],
+        database=config["db_name"],
+        port=int(config["db_port"]),
+        user=config["db_user"],
+        password=config["db_password"],
     )
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB {e}")
@@ -21,7 +21,6 @@ cur = conn.cursor()
 queries = [
     "DROP DATABASE kindle",
     "CREATE OR REPLACE DATABASE kindle",
-
     # Tables
     """
     CREATE TABLE kindle.Book (
@@ -59,30 +58,29 @@ queries = [
         AuthorId int,
         PRIMARY KEY (QuoteId))
     """,
-
     # Foreign keys
     "ALTER TABLE kindle.Book ADD CONSTRAINT Author_FK FOREIGN KEY (AuthorId) REFERENCES kindle.Author(AuthorId)",
     "ALTER TABLE kindle.Quote ADD CONSTRAINT Quote_Book_FK FOREIGN KEY (BookId) REFERENCES kindle.Book(BookId)",
     "ALTER TABLE kindle.Quote ADD CONSTRAINT Quote_Author_FK FOREIGN KEY (AuthorId) REFERENCES kindle.Author(AuthorId)",
     "ALTER TABLE kindle.Temporary ADD CONSTRAINT Temporary_Book_FK FOREIGN KEY (BookId) REFERENCES kindle.Book(BookId)",
-    "ALTER TABLE kindle.Temporary ADD CONSTRAINT Temporary_Author_FK FOREIGN KEY (AuthorId) REFERENCES kindle.Author(AuthorId)"
+    "ALTER TABLE kindle.Temporary ADD CONSTRAINT Temporary_Author_FK FOREIGN KEY (AuthorId) REFERENCES kindle.Author(AuthorId)",
 ]
 
 for query in queries:
     cur.execute(query)
 
-authors = [
-    (1, "Guy Patterson")
-]
+authors = [(1, "Guy Patterson")]
 cur.executemany("INSERT INTO kindle.Author VALUES (?, ?)", authors)
 
-books = [
-    (1, "The Wonders", 1)
-]
+books = [(1, "The Wonders", 1)]
 cur.executemany("INSERT INTO kindle.Book VALUES (?, ?, ?)", books)
 
-cur.execute("insert into kindle.Temporary values (1, 'I am Spartacus', '2021-05-03', 5, 'Loc 2-3', 1, 1)")
-cur.execute("insert into kindle.Quote values (1, 'I am Spartacus', '2021-05-03', 5, 'Loc 2-3', 1, 1)")
+cur.execute(
+    "insert into kindle.Temporary values (1, 'I am Spartacus', '2021-05-03', 5, 'Loc 2-3', 1, 1)"
+)
+cur.execute(
+    "insert into kindle.Quote values (1, 'I am Spartacus', '2021-05-03', 5, 'Loc 2-3', 1, 1)"
+)
 
 conn.commit()
 

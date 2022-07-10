@@ -6,8 +6,8 @@ db = Db(
     host=config["db_host"],
     port=config["db_port"],
     database=config["db_name"],
-    user=config['db_user'],
-    password=config['db_password']
+    user=config["db_user"],
+    password=config["db_password"],
 )
 
 # Indicates how many characters from a quote should be evaluated before considering it a duplicate
@@ -18,9 +18,9 @@ def read_file(path):
     block = []
     clips = []
 
-    f = open(path, 'r', encoding='utf-8-sig')
+    f = open(path, "r", encoding="utf-8-sig")
     for line in f:
-        if line.startswith('='):
+        if line.startswith("="):
             clips.append(block)
             block = []
         else:
@@ -52,7 +52,7 @@ def insert_author(author):
     max_id_sql = "SELECT max(AuthorId) FROM Author"
     result = db.query(max_id_sql)
 
-    author_id = int(result[0][0])+1
+    author_id = int(result[0][0]) + 1
     db.query(f'INSERT INTO Author (AuthorId, Name) VALUES ({author_id}, "{author}")')
 
     return author_id
@@ -74,7 +74,7 @@ def insert_book(book, author_id):
     sql = "SELECT max(BookId) FROM Book"
     result = db.query(sql)
 
-    book_id = int(result[0][0])+1
+    book_id = int(result[0][0]) + 1
     db.query(f'INSERT INTO Book (Name, AuthorId) VALUES ("{book}", {author_id})')
 
     return book_id
@@ -86,7 +86,7 @@ def get_book_id(book, author):
 
     if result:
         book_id = int(result[0][0])
-        logger.info(f'Found book ID for {book}: {book_id}')
+        logger.info(f"Found book ID for {book}: {book_id}")
         return book_id
 
     return insert_book(book, author)
@@ -102,24 +102,26 @@ def clean_quote_text(text):
 def insert_quote(author_id, book_id, quote, to_temporary_table=False):
     table = "Temporary" if to_temporary_table else "Quote"
     text = clean_quote_text(quote.text)
-    db.query(f'''
+    db.query(
+        f"""
         INSERT INTO {table} (Text, DateAdded, Page, Location, BookId, AuthorId)
         VALUES ("{text}", "{quote.date}", "{quote.page}", "{quote.location}", {book_id}, {author_id})
-    ''')
+    """
+    )
 
 
 def add_quote_character_escape(text):
-    if '\'' in text:
-        text = text.replace('\'', '\\\'')
-    if '\"' in text:
-        text = text.replace('\"', '\\"')
+    if "'" in text:
+        text = text.replace("'", "\\'")
+    if '"' in text:
+        text = text.replace('"', '\\"')
     return text
 
 
 def get_unique_quote(quote):
-    '''
+    """
     Searches Temporary table for quote duplicates and returns the valid, unique quote, which is the one with the MAX rown number.
-    '''
+    """
     search_substring = quote.text[:duplicate_search_substring_threshold]
     search_substring = clean_quote_text(search_substring)
     sql = f"""
@@ -138,23 +140,23 @@ def get_unique_quote(quote):
     if result:
         result_tuple = result[0]
         return Quote(
-                text=result_tuple[1],
-                date=result_tuple[2],
-                page=result_tuple[3],
-                location=result_tuple[4],
-                book_id=result_tuple[5],
-                author_id=result_tuple[6]
-            )
+            text=result_tuple[1],
+            date=result_tuple[2],
+            page=result_tuple[3],
+            location=result_tuple[4],
+            book_id=result_tuple[5],
+            author_id=result_tuple[6],
+        )
     return quote
 
 
 def is_duplicate_quote(quote):
     clean_text = clean_quote_text(quote.text)
-    sql = f'SELECT QuoteId FROM Quote WHERE Text=\"{clean_text}\"'
+    sql = f'SELECT QuoteId FROM Quote WHERE Text="{clean_text}"'
     result = db.query(sql)
 
     if result:
-        logger.warning(f'DUPLICATE FOUND: {quote.text}')
+        logger.warning(f"DUPLICATE FOUND: {quote.text}")
         return True
     return False
 
